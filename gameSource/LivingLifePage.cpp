@@ -900,7 +900,7 @@ static char *getDisplayObjectDescription( int inID ) {
 typedef enum messageType {
     SHUTDOWN,
     SERVER_FULL,
-	SEQUENCE_NUMBER,
+    SEQUENCE_NUMBER,
     ACCEPTED,
     NO_LIFE_TOKENS,
     REJECTED,
@@ -2152,6 +2152,10 @@ LivingLifePage::LivingLifePage()
           mMapOffsetY( 0 ),
           mEKeyEnabled( false ),
           mEKeyDown( false ),
+          mWKeyDown( false ),
+          mAKeyDown( false ),
+          mSKeyDown( false ),
+          mDKeyDown( false ),
           mGuiPanelSprite( loadSprite( "guiPanel.tga", false ) ),
           mGuiBloodSprite( loadSprite( "guiBlood.tga", false ) ),
           mNotePaperSprite( loadSprite( "notePaper.tga", false ) ),
@@ -17989,6 +17993,36 @@ void LivingLifePage::step() {
             }
         }
     
+    bool doMove=false;
+    int moveX=ourLiveObject->xd;
+    int moveY=ourLiveObject->yd;
+    if (mWKeyDown) {// W
+        if (moveY-ourLiveObject->currentPos.y<0.5){
+            moveY+=1;
+            doMove=true;
+        }
+    }
+    if (mAKeyDown) {// A
+        if (moveX-ourLiveObject->currentPos.x>-0.5){
+            moveX-=1;
+            doMove=true;
+        }
+    }
+    if (mSKeyDown) {// S
+        if (moveY-ourLiveObject->currentPos.y>-0.5){
+            moveY-=1;
+            doMove=true;
+        }
+    }
+    if (mDKeyDown) {// D
+        if (moveX-ourLiveObject->currentPos.x<0.5){
+            moveX+=1;
+            doMove=true;
+        }
+    }
+    if (doMove){
+        moveToDest(ourLiveObject,moveX,moveY);
+    }
     }
 
 
@@ -20329,7 +20363,12 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
 
     
     if( mustMove ) {
-        
+        moveToDest(ourLiveObject,moveDestX,moveDestY);
+        }
+    }
+
+void LivingLifePage::moveToDest( LiveObject *inObject, int moveDestX, int moveDestY){
+        LiveObject* ourLiveObject=inObject;
         int oldXD = ourLiveObject->xd;
         int oldYD = ourLiveObject->yd;
         
@@ -20539,9 +20578,7 @@ void LivingLifePage::pointerDown( float inX, float inY ) {
 
             
         updateMoveSpeed( ourLiveObject );
-        }    
-    }
-
+}
 
 
 
@@ -20618,8 +20655,7 @@ void LivingLifePage::pointerUp( float inX, float inY ) {
 void LivingLifePage::keyDown( unsigned char inASCII ) {
     
     registerTriggerKeyCommand( inASCII, this );
-
-
+    
     if( mServerSocket == -1 ) {
         // dead
         return;
@@ -20632,7 +20668,6 @@ void LivingLifePage::keyDown( unsigned char inASCII ) {
         return;
         }
 
-    
     switch( inASCII ) {
         /*
         // useful for testing
@@ -20783,6 +20818,26 @@ void LivingLifePage::keyDown( unsigned char inASCII ) {
             trailColors.deleteAll();
             break;
         */
+        case 'w':
+            if( ! mSayField.isFocused() ) {
+                mWKeyDown=true;
+            }
+            break;
+        case 'a':
+            if( ! mSayField.isFocused() ) {
+                mAKeyDown=true;
+            }
+            break;
+        case 's':
+            if( ! mSayField.isFocused() ) {
+                mSKeyDown=true;
+            }
+            break;
+        case 'd':
+            if( ! mSayField.isFocused() ) {
+                mDKeyDown=true;
+            }
+            break;
         case 'e':
         case 'E':
             if( ! mSayField.isFocused() ) {
@@ -21201,6 +21256,18 @@ void LivingLifePage::specialKeyDown( int inKeyCode ) {
 void LivingLifePage::keyUp( unsigned char inASCII ) {
 
     switch( inASCII ) {
+        case 'w':
+            mWKeyDown = false;
+            break;
+        case 'a':
+            mAKeyDown = false;
+            break;
+        case 's':
+            mSKeyDown = false;
+            break;
+        case 'd':
+            mDKeyDown = false;
+            break;
         case 'e':
         case 'E':
             mEKeyDown = false;

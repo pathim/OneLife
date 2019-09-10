@@ -581,6 +581,11 @@ class LivingLifePage : public GamePage, public ActionListener {
 
         char mEKeyEnabled;
         char mEKeyDown;
+
+        bool mWKeyDown;
+        bool mAKeyDown;
+        bool mSKeyDown;
+        bool mDKeyDown;
         
 
         SpriteHandle mGuiPanelSprite;
@@ -834,6 +839,7 @@ class LivingLifePage : public GamePage, public ActionListener {
         
         double mPageStartTime;
 
+        void moveToDest( LiveObject *inObject, int moveDestX, int moveDestY );
         void computePathToDest( LiveObject *inObject );
         
         double computePathSpeedMod( LiveObject *inObject, int inPathLength );
